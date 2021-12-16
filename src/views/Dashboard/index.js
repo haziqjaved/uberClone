@@ -1,21 +1,28 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, Button, StyleSheet, Dimensions, TextInput, ScrollView } from 'react-native'
+import { View, Text, Button, StyleSheet, Dimensions, ScrollView } from 'react-native'
 import MapView, { Marker } from 'react-native-maps'
 import * as Location from 'expo-location';
 import { Searchbar } from 'react-native-paper';
 
-const Dashboard = ({navigation}) => {
+
+export default Dashboard = ({navigation}) => {
 
     const [location, setLocation] = useState({});
     const [errorMsg, setErrorMsg] = useState(null);
     const [data, setData] = useState(null);
-
-    const [destination, setDestination] = useState([]);
-
-    const [pickupLocation, setPickupLocation] = useState({})
     const [userInput, setUserInput] = useState()
-
-
+    const [currentLoc, setCurrentLoc] = useState([]);
+  
+    const [selectedLocLat, setSelectedLocLat] = useState();
+    const [selectedLocLong, setSelectedLocLong] = useState();
+    
+    // const [finalLocLat, setFinalLocLat] = useState();
+    // const [finalLocLong, setFinalLocLong] = useState();
+    // const [nameOfLoc,setNameOfLoc] = useState();
+    // const [nameOfFinalLoc,setNameOfFinalLoc] = useState();
+    // const [selectedLoc, setSelectedLoc] = useState([nameOfFinalLoc,finalLocLat,finalLocLong]);
+    // console.log("selecteddd===========>",selectedLoc)
+    
     useEffect(() => {
         (async () => {
           let { status } = await Location.requestForegroundPermissionsAsync(); //requesting to get current location
@@ -25,22 +32,39 @@ const Dashboard = ({navigation}) => {
           }
     
           //To get user's current location
-        //   let location = await Location.getCurrentPositionAsync({});
-        //   console.log('location -->', location)
-        //   setLocation(location.coods); //setting location coordinates i.e latitude, longitude
-          const options = {
-            accuracy: Location.Accuracy.Highest,
-            timeInterval: 3000,
-            distanceInterval: 3
-          }
-          Location.watchPositionAsync(options, ({coords})=>{
+          let location = await Location.getCurrentPositionAsync({});
+          console.log('location -->', location)
+          setLocation(location.coords); 
+          //setting location coordinates i.e latitude, longitude
+          // const options = {
+          //   accuracy: Location.Accuracy.Highest,
+          //   timeInterval: 3000,
+          //   distanceInterval: 3
+          // }
+          // Location.watchPositionAsync(options, ({coords})=>{
             
-            setLocation(coords)
-            // console.log('Coords==>',coords)
-          })
+          //   setLocation(coords)
+          //   // console.log('Coords==>',coords)
+          // })
         })();
       }, []);
     
+
+
+//       const resp = await fetch(`https://api.foursquare.com/v2/venues/search?client_id=QEJ3YKKOS5HOCE4ANKTO4UWF1ERT4SJBNIXPWZGBE0VY02UI&client_secret=QD2I1K00RYVZ5A4TGQFUK3FVZOY44CPZX2NNA25KDQP5NVLI&ll=${latitude},${longitude}&v=20180323`)
+
+//       .then(resp => resp.json())
+//       .then(resp =>
+//       setNameOfLoc(resp.response.venues[0].name)) 
+
+// setFinalLocLat(selectedLocLat? selectedLocLat : latitude)
+// setFinalLocLong(selectedLocLong? selectedLocLong : longitude)
+
+
+
+
+
+
       let text = 'Waiting..';
       if (errorMsg) {
         text = errorMsg;
@@ -56,79 +80,35 @@ const Dashboard = ({navigation}) => {
         method:'GET',
         headers:{
         Accept: 'application/json',
-        'Authorization': 'fsq3GaTpi6UpdRBuiCCtAEbtrvg0YoHYvgpKP90yqR4lHyI='
-    }
+        'Authorization': 'fsq3GaTpi6UpdRBuiCCtAEbtrvg0YoHYvgpKP90yqR4lHyI='}
     })
 
       const result = await res.json();
       if(result == null){
-        const test = {
-          name: 'test'
-        }
-        setData(test)
         console.log('no data');
       }
       else{
         console.log('has data');
         setData(result)
-      
-    }
-      // console.log('result data --> ', data)
-      // return result
-    }  
-
-    const renderItem = ({ item }) => {
-        <View>
-          <Text  title={item.name}></Text>
-        </View>
-    }
-
-    const { latitude, longitude } = location
-
-    const ListEmptyComponent = () => {
-      return <View>
-        <Text>Nothing to Show</Text>
-      </View>
-    }
-
-    const storeDestination=(item)=>
+    }}
+    const { latitude, longitude }=location
+    const storeCurrentLocation=(item)=>
     {
-          const desti=[...destination]
-          desti.push(
-            item.name,
-            item.geocodes.main.latitude,
-            item.geocodes.main.longitude
-            )
-          setDestination(desti)
-          console.log('Destination is -->',destination)
-    }
-
+      const[name,latitude,longitude]=[item.name,item.geocodes.main.latitude,item.geocodes.main.longitude]
+      // setNameOfFinalLoc(name?name:nameOfLoc)
+      setSelectedLocLat(latitude);
+      setSelectedLocLong(longitude);
+      currentLoc.push(name,latitude,longitude)
+      setCurrentLoc(currentLoc)
+      console.log('selected location is--->',currentLoc)}
     return(
-        <View>
-            <Searchbar  onChangeText={setUserInput}
-          placeholder={'Current Location!'} 
-          onIconPress={searchLocation}
-          style={{ width: '100%', backgroundColor: '#D9DDE1',marginBottom:5 ,fontSize: 25 }}/>   
-
-   
-            {/* 
-              {result.map(item => {
-                return <View>
-                  <Text>{item.name}</Text>
-                </View>
-              })}
-            </ScrollView> */}
-            
-              
-            
-            {/* <FlatList data={data} renderItem={renderItem} ListEmptyComponent={ListEmptyComponent}/> */}
-            {/* <FlatList style={{ flex:1, height:200}} 
-            data={data.results.name} renderItem={renderItem} keyExtractor={item => item.name} /> */}
-            
-            {/* {data.map(item => {
-              return <li>{item.name}</li>
-            })} */}
-            
+        <View>   
+            <Searchbar
+            onChangeText={setUserInput} 
+            value={userInput}
+            placeholder={'Current Location!'} 
+            onIconPress={searchLocation}
+            style={{ width: '100%', backgroundColor: '#D9DDE1',marginBottom:5 ,fontSize: 25 }}/>     
             {data == null ?
                 console.log('no data found')
               :  
@@ -138,33 +118,32 @@ const Dashboard = ({navigation}) => {
                       fontSize:15, 
                       backgroundColor:'#fff', 
                       marginVertical:6,
-                      }} onPress={()=>storeDestination(item)}>{item.name}</Text>
+                      }} onPress={()=>storeCurrentLocation(item)}>{item.name}</Text>
                   </ScrollView>
                 })
              }
 
             {/* {console.log('user input from text area -->',userInput)} */}
-            {/* {console.log('selected destination  -->',destination)} */}
+            {/* {console.log('selected current Location  -->',currentLoc)} */}
             <MapView
             region={{
-                latitude: latitude ||24.8871551,
-                longitude:longitude || 67.1621253,
-                latitudeDelta:0.0010,
-                longitudeDelta:0.0010
+              latitude:  selectedLocLat || latitude ||24.8871551,
+              longitude: selectedLocLong  || longitude || 67.1621253,
+                latitudeDelta:0.0020,
+                longitudeDelta:0.0020
             }}
-            style={styles.map}
-            >
+            style={styles.map} >
             <Marker 
             coordinate={{
-              latitude: latitude ||24.8871551,
-              longitude:longitude || 67.1621253,
+              latitude:  selectedLocLat || latitude ||24.8871551,
+              longitude: selectedLocLong  || longitude || 67.1621253,
+
             }}
-            title={'pickUp'}
-            /> 
+            title={'pickUp'} /> 
            </MapView>
             <Button
-            title="Choose Destination"
-            onPress={() => navigation.navigate('Destination')}
+            title="Select Destination"
+            onPress={() => navigation.navigate('Destination',currentLoc)}
             />  
        </View>
     )
@@ -175,7 +154,7 @@ const styles = StyleSheet.create({
       flex: 1,
       backgroundColor: '#fff',
       alignItems: 'center',
-      justifyContent: 'center',
+      justifyContent: 'center'
     },
     map: {
       width: Dimensions.get('window').width,
@@ -188,4 +167,3 @@ const styles = StyleSheet.create({
       marginHorizontal: 16,
     },
   });
-export default Dashboard;

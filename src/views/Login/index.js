@@ -12,7 +12,7 @@ const forget=()=>{
 }
 
   
-const  Login=({navigation})=> {
+export default Login=({navigation})=> {
     // const navigation=useNavigation();  
     // const [email, setEmail] = useState("");
     // const [password, setPassword] = useState("");
@@ -57,7 +57,7 @@ const  Login=({navigation})=> {
         </View>
     );
 }
-export default Login
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,

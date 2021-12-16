@@ -38,29 +38,3 @@ initializeApp(firebaseConfig)
 const auth = getAuth()
 const db = getFirestore()
 const storage = getStorage()
-
-
-async function registerUser(authParams) {
-     const {userName,email,phoneNum,password,}=authParams;
-    const { user: { uid } } = await createUserWithEmailAndPassword(auth, email, password)
-    await setDoc(doc(db, 'users', uid), {
-      userName, email, password,phoneNum
-    })
-  }
-  async function loginUser(email, password) {
-    const { user: { uid } } = await signInWithEmailAndPassword(auth, email, password)
-    const docRef = doc(db, "users", uid)
-    const docSnap = await getDoc(docRef)
-  
-    if (docSnap.exists()) {
-      console.log("Document data:", docSnap.data())
-    } else {
-      console.log("No such document!");
-    }
-    return { uid, ...docSnap.data() }
-  }
-
-export default db;
-export {
-    registerUser,loginUser
-}

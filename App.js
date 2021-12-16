@@ -1,27 +1,28 @@
 import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Login from './src/views/Login/Login';
-import SignUp from './src/views/SignUp/SignUp';
-import Dashboard from './src/views/Dashboard';
-import Destination from './src/views/Destination';
-import selectCar from './src/views/selectCar';
+import { View,StyleSheet } from 'react-native';
+import MainNavigation from './src/config/AllNavigation';
 
 
 
 const Stack = createNativeStackNavigator();
 
-function App() {
+export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator >
-      <Stack.Screen name="LogIn"  component={Login}  />
-      <Stack.Screen name="SignUp" component={SignUp} />
-      <Stack.Screen name="Dashboard" component={Dashboard} />
-      <Stack.Screen name='Destination' component={Destination} />
-      <Stack.Screen name='Cars' component={selectCar}/>
-      </Stack.Navigator>
-    </NavigationContainer>
+    <View style={styles.container}>
+      <MainNavigation />
+    </View>
   );
 }
-export default App;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    width: '100%',
+    backgroundColor: '#fff'
+  },
+  imageStyle: {
+    width: 300,
+    height: 200
+  }
+});
